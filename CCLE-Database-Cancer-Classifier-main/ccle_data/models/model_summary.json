@@ -1,0 +1,19 @@
+{
+    "model_type": "LogisticRegression",
+    "num_features": 500,
+    "num_classes": 22,
+    "label_map": {
+        "small_intestine": "DIGESTIVE",
+        "salivary_gland": "OTHER"
+    },
+    "timestamp": "2025-05-10 11:10:42",
+    "execution_times": {
+        "load_data": 114.83820986747742,
+        "engineer_features": 43.09138894081116,
+        "select_features": 4055.315432548523,
+        "preprocess_data": 4253.340232849121,
+        "train_base_models": 33994.8983194828,
+        "build_ensemble_model": 1427.5928573608398,
+        "evaluate_model": 6.910047292709351
+    }
+}
