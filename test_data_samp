@@ -1,0 +1,50 @@
+import pandas as pd
+import numpy as np
+import joblib
+import re
+
+# Modeli yükle
+model_path = "./ccle_data/ccle_cancer_classifier_model.pkl"
+model_package = joblib.load(model_path)
+
+# Hata mesajındaki eksik genleri çıkaralım
+missing_genes = [
+    "ENSG00000000003.10", "ENSG00000000005.5", "ENSG00000000419.8", 
+    "ENSG00000000457.9", "ENSG00000000460.12"
+    # ... burada hata mesajında gördüğünüz tüm genleri ekleyin
+]
+
+# Model fit_transform işleminde kullanılan scaler nesnesini kontrol edelim
+if hasattr(model_package['scaler'], 'feature_names_in_'):
+    model_features = model_package['scaler'].feature_names_in_
+    print(f"Scaler'dan alınan özellik sayısı: {len(model_features)}")
+else:
+    # Model bileşenlerinde gerekli tüm özellikleri bulmaya çalışalım
+    # selected_features, model'in seçtiği özellikleri içerebilir
+    model_features = model_package['selected_features']
+    print(f"Selected features'dan alınan özellik sayısı: {len(model_features)}")
+    
+    # Eksik genleri ekleyelim
+    all_features = list(model_features) + missing_genes
+    # Tekrar eden değerleri kaldıralım
+    model_features = list(set(all_features))
+    print(f"Eksik genler eklendikten sonra toplam: {len(model_features)}")
+
+# Test verisi oluştur
+test_data = pd.DataFrame(
+    np.random.uniform(0, 15, size=(10, len(model_features))),  # 10 örnek
+    columns=model_features,
+    index=['MCF7_BREAST', 'A549_LUNG', 'HCT116_LARGE_INTESTINE', 'PC3_PROSTATE', 
+           'SKMEL28_SKIN', 'HepG2_LIVER', 'K562_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 
+           'U87MG_CENTRAL_NERVOUS_SYSTEM', 'MDAMB231_BREAST', 'PANC1_PANCREAS']
+)
+
+# CSV olarak kaydet
+test_data.to_csv("complete_ccle_test_data.csv", encoding='utf-8')
+print(f"Test verisi 'complete_ccle_test_data.csv' dosyasına kaydedildi")
+
+# Ayrıca eksik gen listesini de kaydedelim - elle eklenebilir
+with open("missing_genes.txt", "w") as f:
+    for gene in missing_genes:
+        f.write(gene + "\n")
+print("Eksik genler 'missing_genes.txt' dosyasına kaydedildi")

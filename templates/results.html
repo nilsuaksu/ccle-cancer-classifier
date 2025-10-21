@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CCLE Kanser Sýnýflandýrýcý - Sonuçlar</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container { max-width: 900px; margin-top: 30px; }
+        .result-row { margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee; }
+        .chart-container { margin: 20px 0; }
+        .details-btn { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Kanser Türü Tahmin Sonuçlarý</h1>
+        <h5 class="text-center mb-4">Dosya: {{ filename }}</h5>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                Görselleþtirme
+            </div>
+            <div class="card-body chart-container">
+                <img src="{{ chart_image }}" class="img-fluid" alt="Tahmin Sonuçlarý Grafiði">
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                Detaylý Sonuçlar
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Hücre Hattý ID</th>
+                            <th>Tahmin Edilen Kanser Türü</th>
+                            <th>Güven Skoru</th>
+                            <th>Detaylar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr>
+                            <td>{{ result.sample_id }}</td>
+                            <td>{{ result.predicted_cancer }}</td>
+                            <td>{{ "%.2f"|format(result.confidence*100) }}%</td>
+                            <td>
+                                <button class="btn btn-sm btn-info details-btn" data-toggle="collapse" data-target="#details-{{ loop.index }}">
+                                    Detaylarý Göster
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="p-0">
+                                <div id="details-{{ loop.index }}" class="collapse">
+                                    <div class="p-3 bg-light">
+                                        <h6>Tüm Kanser Türleri için Olasýlýklar:</h6>
+                                        <ul>
+                                            {% for cancer_type, prob in result.class_probabilities|dictsort(by='value', reverse=true) %}
+                                                <li>{{ cancer_type }}: {{ "%.2f"|format(prob*100) }}%</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-primary">Ana Sayfaya Dön</a>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+        
